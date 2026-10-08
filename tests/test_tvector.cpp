@@ -8,7 +8,7 @@
 
 TEST(FunctionsForMemData, calculate_capacity) {
     // Создаём объект с ненулевым размером, чтобы проверить ветку size <= _size
-    TMemData<double> md = { 1.0, 2.0, 3.0 };   // _size=3, _capacity=3
+    TMemData<double> md = { 1.0, 2.0, 3.0 };// _size=3, _capacity=3
     // size <= _size и >0 => возвращает size
     EXPECT_EQ(md.calculate_capacity(2), 2);
     EXPECT_EQ(md.calculate_capacity(3), 3);
@@ -433,12 +433,12 @@ TEST(ClassVector, can_push_back_in_empty_vector) {
     EXPECT_EQ(v1.capacity(), MEM_STEP);
 }
 TEST(ClassVector, can_push_back_with_reallocation) {
-    TVector<double> v = { 1.0, 2.0, 3.0 };      // capacity=3, full
-    v.push_back(4.0);                 // должна произойти реаллокация с FRONT_BUFFER
+    TVector<double> v = { 1.0, 2.0, 3.0 };// capacity=3, full
+    v.push_back(4.0);// должна произойти реаллокация с FRONT_BUFFER
 
     EXPECT_EQ(v.size(), 4);
     EXPECT_GE(v.capacity(), 4);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER); // начало сдвинуто на буфер
+    EXPECT_EQ(v.front_pos(), FRONT_BUFFER);// начало сдвинуто на буфер
     EXPECT_DOUBLE_EQ(v.front(), 1.0);
     EXPECT_DOUBLE_EQ(v.back(), 4.0);
     EXPECT_DOUBLE_EQ(v[0], 1.0);
@@ -462,12 +462,12 @@ TEST(ClassVector, can_insert_to_front) {
     EXPECT_EQ(v1.size(), 4);
 }
 TEST(ClassVector, can_insert_with_reallocation) {
-    TVector<double> v = { 1.0, 2.0, 3.0 };      // capacity=3, full
-    v.insert(99.0, 1);                // вставка в середину требует реаллокации
+    TVector<double> v = { 1.0, 2.0, 3.0 };// capacity=3, full
+    v.insert(99.0, 1);// вставка в середину требует реаллокации
 
     EXPECT_EQ(v.size(), 4);
     EXPECT_GE(v.capacity(), 4);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER); // данные выровнены с буфером
+    EXPECT_EQ(v.front_pos(), FRONT_BUFFER);// данные выровнены с буфером
     EXPECT_DOUBLE_EQ(v[0], 1.0);
     EXPECT_DOUBLE_EQ(v[1], 99.0);
     EXPECT_DOUBLE_EQ(v[2], 2.0);
@@ -617,7 +617,8 @@ TEST(ClassVector, pop_single_element) {
     EXPECT_TRUE(v.is_empty());
     EXPECT_EQ(v.size(), 0);
 }
-
+    
+    
 TEST(ClassVector, pop_front_back_alternating) {
     TVector<double> v = { 1.0, 2.0, 3.0, 4.0, 5.0 };
 
@@ -1038,7 +1039,7 @@ TEST(ClassVector, throw_when_insert_n_wrong_position) {
 // erase_n
 TEST(ClassVector, can_erase_n_middle) {
     TVector<double> v = { 1.0, 99.0, 100.0, 2.0, 3.0 };
-    v.erase_n(1, 2);                 // удаляем два элемента начиная с позиции 1
+    v.erase_n(1, 2);// удаляем два элемента начиная с позиции 1
 
     EXPECT_EQ(v.size(), 3);
     EXPECT_DOUBLE_EQ(v[0], 1.0);
@@ -1048,7 +1049,7 @@ TEST(ClassVector, can_erase_n_middle) {
 
 TEST(ClassVector, can_erase_n_front) {
     TVector<double> v = { 1.0, 2.0, 3.0, 4.0, 5.0 };
-    v.erase_n(0, 2);                 // удаляем первые два
+    v.erase_n(0, 2);// удаляем первые два
 
     EXPECT_EQ(v.size(), 3);
     EXPECT_DOUBLE_EQ(v[0], 3.0);
@@ -1058,7 +1059,7 @@ TEST(ClassVector, can_erase_n_front) {
 
 TEST(ClassVector, can_erase_n_back) {
     TVector<double> v = { 1.0, 2.0, 3.0, 4.0, 5.0 };
-    v.erase_n(3, 2);                 // удаляем последние два
+    v.erase_n(3, 2);// удаляем последние два
 
     EXPECT_EQ(v.size(), 3);
     EXPECT_DOUBLE_EQ(v[0], 1.0);

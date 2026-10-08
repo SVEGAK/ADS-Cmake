@@ -7,31 +7,31 @@ template <typename T>
 class TVector;
 template <typename T>
 class TMemData {
-    T* _data;                   // хранилище данных
-    size_t _size;              // размер заполненной части хранилища
-    size_t _capacity;         // вместимость хранилища
+    T* _data;// хранилище данных
+    size_t _size;// размер заполненной части хранилища
+    size_t _capacity;// вместимость хранилища
 
 public:
-    TMemData(size_t size = 0);                            // конструктор по размеру + по умолчанию
-    TMemData(std::initializer_list<T> list);             // конструктор по списку инициализации
-    TMemData(T* data, size_t size);                     // конструктор инициализации
-    TMemData(const TMemData& other);                   // конструктор копирования
-    TMemData(TMemData&& other) noexcept;              // конструктор с move-семантикой
-    ~TMemData();                                     // деструктор
+    TMemData(size_t size = 0);// конструктор по размеру + по умолчанию
+    TMemData(std::initializer_list<T> list);// конструктор по списку инициализации
+    TMemData(T* data, size_t size);       // конструктор инициализации
+    TMemData(const TMemData& other);     // конструктор копирования
+    TMemData(TMemData&& other) noexcept;// конструктор с move-семантикой
+    ~TMemData();                       // деструктор
 
-    inline bool is_empty() const noexcept;   // проверка на пустоту
-    inline bool is_full() const noexcept;    // проверка на переполнение
+    inline bool is_empty() const noexcept;          // проверка на пустоту
+    inline bool is_full() const noexcept;          // проверка на переполнение
     inline size_t calculate_capacity(size_t size);
 
-    inline size_t size() const noexcept;                  // геттер размера
+	inline size_t size() const noexcept;// геттер размера
     inline size_t capacity() const noexcept;             // геттер вместимости
     inline const T* const data() const noexcept;        // геттер хранилища
 
-    void set_memory(size_t size) noexcept;                                    // установка памяти без сохранения данных
+    void set_memory(size_t size) noexcept;             // установка памяти без сохранения данных
     void reset_memory(size_t size, size_t start_index = 0, size_t placement_offset = 0, bool cap_calculation = true) noexcept;          // перевыделение памяти с сохранением данных
-    inline void clear_memory() noexcept;                                             // очистка памяти
+    inline void clear_memory() noexcept;              // очистка памяти
 
-    TMemData& operator=(const TMemData& other);         // оператор присваивания
+    TMemData& operator=(const TMemData& other);      // оператор присваивания
     TMemData& operator=(TMemData&& other) noexcept;              // оператор присваивания с move-семантикой
 
     friend class TVector<T>;
