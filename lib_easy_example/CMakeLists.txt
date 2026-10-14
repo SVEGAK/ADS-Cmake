@@ -1,1 +1,1 @@
-create_project_lib(EasyExample)
+create_project_lib(Algoritms)
