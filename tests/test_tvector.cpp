@@ -1,8 +1,8 @@
 // Copyright 2026 SVEGAK/Novikov R
 
-#include "gtest/gtest.h"
-
 #include <utility>
+
+#include "gtest/gtest.h"
 
 #define MEMDATA_TESTS
 #define VECTOR_TESTS

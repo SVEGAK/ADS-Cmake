@@ -17,7 +17,7 @@ class TMemData {
     size_t _size;      // размер заполненной части хранилища
     size_t _capacity;  // вместимость хранилища
 
-public:
+ public:
     explicit TMemData(size_t size = 0);        // конструктор по размеру
     TMemData(std::initializer_list<T> list);   // конструктор по списку
     TMemData(T* data, size_t size);            // конструктор инициализации
@@ -165,8 +165,7 @@ void TMemData<T>::reset_memory(size_t size, size_t start_index,
         for (size_t i = 0; i < _size; i++) {
             _data[i + placement_offset] = old_data[i + start_index];
         }
-    }
-    else {  // size <= _size
+    }else {  // size <= _size
         for (size_t i = 0; i < size; i++) {
             _data[i + placement_offset] = old_data[i + start_index];
         }

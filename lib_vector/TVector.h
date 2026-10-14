@@ -18,7 +18,7 @@ class TVector {
     size_t _front;     // индекс первого элемента
     size_t _back;      // индекс последнего элемента
 
-public:
+ public:
     explicit TVector(size_t size = 0);  // конструктор по размеру
     TVector(std::initializer_list<T>);  // конструктор по списку
     TVector(T* list, size_t size);      // конструктор инициализации
@@ -188,8 +188,7 @@ TVector<T>::TVector(size_t size) {  // конструктор по умолча�
     _front = 0;
     if (size == 0) {
         _back = size;
-    }
-    else {
+    }else {
         _back = size - 1;
     }
     _mem = object;
@@ -210,8 +209,7 @@ TVector<T>::TVector(T* list, size_t size) {
     _mem = mem;
     if (size == 0) {
         _back = size;
-    }
-    else {
+    }else {
         _back = size - 1;
     }
 }
@@ -277,8 +275,7 @@ void TVector<T>::push_back(T elem) noexcept {
         _back = _front + size() - 1;
         _mem._data[_back] = elem;
         return;
-    }
-    else if (is_full()) {
+    }else if (is_full()) {
         // выделяем буфер
         _mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
         _front = FRONT_BUFFER;
@@ -308,8 +305,7 @@ void TVector<T>::insert(T elem, size_t pos) {
         _mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
         _front = FRONT_BUFFER;
         _back = _front + size() - 1;
-    }
-    else {
+    }else {
         size_increase();
         _back++;
     }
@@ -374,8 +370,7 @@ void TVector<T>::pop_back() {
         size_decrease();
         compress();
         return;
-    }
-    else if (_back < 0) {
+    }else if (_back < 0) {
         throw std::out_of_range("back pos element out of massive.");
     }
     _mem._data[_back] = T();
@@ -397,8 +392,7 @@ void TVector<T>::erase(size_t pos) {  // pos - логический индекс
     if (pos == 0) {
         (*this).pop_front();
         return;
-    }
-    else if (pos == (_mem._size - 1)) {
+    }else if (pos == (_mem._size - 1)) {
         (*this).pop_back();
         return;
     }
