@@ -1,1 +1,1 @@
-﻿create_project_lib(vector)
+﻿create_project_lib(DS_VECTOR)
