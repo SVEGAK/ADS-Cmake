@@ -1,7 +1,7 @@
 // Copyright 2024 Marina Usova
 
 #include <gtest/gtest.h>
-#include "../lib_easy_example/easy_example.h"
+#include "algorithms.cpp"
 
 #define EPSILON 0.000001
 
@@ -47,4 +47,25 @@ TEST(TestEasyExampleLib, throw_when_try_div_by_zero) {
 
   // Act & Assert
   ASSERT_ANY_THROW(division(x, y));
+}
+
+TEST(TestCheckBreckets, empty_string) {
+    std::string input = "";
+    EXPECT_THROW( check_breckets(input),std::invalid_argument);
+}
+TEST(TestCheckBreckets, correct_brekets) {
+    std::string input = "( [ { } ] )";
+    EXPECT_TRUE(check_breckets(input));
+}
+TEST(TestCheckBreckets, uncorrect_breket) {
+    std::string input = "( [ { } ] ]";
+    EXPECT_FALSE(check_breckets(input));
+}
+TEST(TestCheckBreckets, extra_closed_brekets) {
+    std::string input = "( [ { } ] ) )";
+    EXPECT_FALSE(check_breckets(input));
+}
+TEST(TestCheckBreckets, extra_opened_brekets) {
+    std::string input = "( [ { } ] ) (";
+    EXPECT_FALSE(check_breckets(input));
 }
