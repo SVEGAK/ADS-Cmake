@@ -3,8 +3,6 @@
 #ifndef LIB_VECTOR_TVECTOR_H_
 #define LIB_VECTOR_TVECTOR_H_
 
-#include <cstddef>
-#include <cstdlib>
 #include <ctime>
 #include <initializer_list>
 #include <iostream>
@@ -35,13 +33,12 @@ public:
     inline void shrink_to_fit();      // освобождение лишней памяти
     inline size_t size() const noexcept;      // геттер размера
     inline size_t capacity() const noexcept;  // геттер вместимости
-    inline T front() const;                   // геттер первого элемента
-    inline T back() const;                    // геттер последнего элемента
+    inline const T& front() const;                   // геттер первого элемента
+    inline const T& back() const;                    // геттер последнего элемента
+    inline T& front();                   // геттер первого элемента
+    inline T& back();                    // геттер последнего элемента
     inline size_t front_pos() const;          // геттер индекса первого
     inline size_t back_pos() const;           // геттер индекса последнего
-
-    inline T& set_front();  // сеттер первого элемента
-    inline T& set_back();   // сеттер последнего элемента
 
     void push_front(T elem);        // вставка элемента в начало
     void push_back(T elem);         // вставка элемента в конец
@@ -92,7 +89,84 @@ public:
     void push_front_n(const T* values, size_t n);  // вставка n в начало
     void insert_n(size_t pos, const T* values, size_t n);  // вставка n
     void erase_n(size_t pos, size_t n);  // удаление n элементов
+
+    template<typename Type>
+    class Iterator {
+        Type* _data;
+        size_t _pos;
+        size_t _front;
+        size_t _capacity;
+    public:
+        Iterator(Type* ptr = nullptr,size_t pos = 0 ,size_t front = 0,size_t capacity = 0) : _data(ptr), _pos(pos),_front(front),_capacity(capacity) {};
+        Iterator(const Iterator& other) : _data(other._data), _pos(other._pos), _front(other._front), _capacity(other._capacity) {};
+        Type& operator*() const {
+            if ((_capacity == 0) || (_data == nullptr)) {
+                throw std::logic_error("It is impossible to dereference a pointer to an empty vector.");
+            }
+            return _data[(_front + _pos) % _capacity];
+        }
+        Iterator& operator++() noexcept{ ++_pos; return *this; }
+        Iterator& operator--() noexcept{ --_pos; return *this; }
+        Iterator operator++(int) noexcept {
+            Iterator cur_copy(*this);
+            return (++cur_copy);
+        };
+        Iterator operator--(int) noexcept {
+            Iterator cur_copy(*this);
+            return (--cur_copy);
+        };
+        bool operator==(Iterator other) const noexcept {
+            return ((_pos == other._pos)&&(_data == other._data));
+        };
+        bool operator!=(Iterator other) const noexcept {
+            return !(*this == other);
+        };
+        Iterator& operator+=(Type num) noexcept {
+            _pos += num;
+            return (*this);
+        };
+        Iterator& operator-=(Type num) noexcept {
+            _pos -= num;
+            return (*this);
+        };
+        Iterator operator+(Type num) const noexcept {
+            Iterator cur_copy(*this);
+            cur_copy += num;
+            return cur_copy;
+        };
+        Iterator operator-(Type num) const noexcept {
+            Iterator cur_copy(*this);
+            cur_copy -= num;
+            return cur_copy;
+        };
+        Type& operator[](size_t pos) const noexcept {
+            return *(*(this) + pos) ;
+        };
+        std::make_signed_t<std::size_t> operator-(const Iterator& other) const noexcept {
+            return static_cast<std::make_signed_t<std::size_t>>(_pos) - static_cast<std::make_signed_t<std::size_t>>(other._pos);
+        }
+        Type*   operator->() const { return &_data[(_front + _pos) % _capacity]; }
+
+    };
+    using iterator = Iterator<T>;
+    using const_iterator = Iterator<const T>;
+    //По контракту получается: [begin(), end()), т.е. begin() = логический 0, end() = size() (т.е. реальный конец +1)
+    inline iterator begin() {
+        return iterator(_mem._data, 0, _front, capacity());
+
+    }
+    inline const_iterator cbegin() const {
+        return const_iterator(_mem._data, 0, _front, capacity());
+    }
+    inline iterator end() {
+        return iterator(_mem._data, size(), _front, capacity());
+    }
+    inline const_iterator cend() const {
+        return const_iterator(_mem._data, size(), _front, capacity());
+    }
+
 };
+
 
 template <typename T>
 inline bool TVector<T>::is_empty() const noexcept {
@@ -143,19 +217,35 @@ inline size_t TVector<T>::back_pos() const {
 }
 
 template <typename T>
-inline T TVector<T>::front() const {
+inline T& TVector<T>::front() {
     if (is_empty()) {
         throw std::out_of_range("Buffer ring is empty");
     }
-    return (*this)[0];
+    return _mem._data[_front];
 }
 
 template <typename T>
-inline T TVector<T>::back() const {
+inline const T& TVector<T>::front() const {
     if (is_empty()) {
         throw std::out_of_range("Buffer ring is empty");
     }
-    return (*this)[(*this).size() - 1];
+    return _mem._data[_front];
+}
+
+template <typename T>
+inline T& TVector<T>::back() {
+    if (is_empty()) {
+        throw std::out_of_range("Buffer ring is empty");
+    }
+    return _mem._data[_back];
+}
+
+template <typename T>
+inline const T& TVector<T>::back() const {
+    if (is_empty()) {
+        throw std::out_of_range("Buffer ring is empty");
+    }
+    return _mem._data[_back];
 }
 
 template <typename T>
@@ -166,24 +256,6 @@ inline void TVector<T>::size_decrease() noexcept {
 template <typename T>
 inline void TVector<T>::size_increase() noexcept {
     _mem._size++;
-}
-
-template <typename T>
-inline T& TVector<T>::set_front() {
-    if (is_empty()) {
-        throw std::out_of_range(
-            "Vector::front() called on empty vector");
-    }
-    return _mem._data[_front];
-}
-
-template <typename T>
-inline T& TVector<T>::set_back() {
-    if (is_empty()) {
-        throw std::out_of_range(
-            "Vector::back() called on empty vector");
-    }
-    return _mem._data[_back];
 }
 
 template <typename T>

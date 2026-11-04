@@ -330,7 +330,7 @@ TEST(ClassVector, can_get_back) {
 TEST(ClassVector, can_set_front) {
     TVector<double> v = { 1.0, 2.0, 3.0 };
 
-    v.set_front() = 10.0;
+    v.front() = 10.0;
 
     EXPECT_DOUBLE_EQ(v.front(), 10.0);
     EXPECT_DOUBLE_EQ(v[0], 10.0);
@@ -341,15 +341,24 @@ TEST(ClassVector, can_set_front) {
     for (int i = 0; i < 5; i++) {
         v2.push_back(i * 1.0);
     }
-    v2.set_front() = 99.0;
+    v2.front() = 99.0;
     EXPECT_DOUBLE_EQ(v2.front(), 99.0);
     EXPECT_DOUBLE_EQ(v2[0], 99.0);
+
+    // const-версия front() возвращает const T&: только чтение
+    const TVector<double>& cv2 = v2;
+    EXPECT_DOUBLE_EQ(cv2.front(), 99.0);
+
+    static_assert(std::is_same_v<decltype(v.front()), double&>,
+        "non-const front() must return T&");
+    static_assert(std::is_same_v<decltype(cv2.front()), const double&>,
+        "const front() must return const T&");
 }
 
 TEST(ClassVector, can_set_back) {
     TVector<double> v = { 1.0, 2.0, 3.0 };
 
-    v.set_back() = 30.0;
+    v.back() = 30.0;
 
     EXPECT_DOUBLE_EQ(v.back(), 30.0);
     EXPECT_DOUBLE_EQ(v[2], 30.0);
@@ -357,7 +366,7 @@ TEST(ClassVector, can_set_back) {
     EXPECT_DOUBLE_EQ(v[1], 2.0);
 
     TVector<double> v2 = { 5.0 };
-    v2.set_back() = 50.0;
+    v2.back() = 50.0;
     EXPECT_DOUBLE_EQ(v2.front(), 50.0);
     EXPECT_DOUBLE_EQ(v2.back(), 50.0);
 
@@ -365,10 +374,19 @@ TEST(ClassVector, can_set_back) {
     for (int i = 0; i < 10; i++) {
         v3.push_back(i * 1.0);
     }
-    v3.set_back() = 99.0;
+    v3.back() = 99.0;
     EXPECT_DOUBLE_EQ(v3.back(), 99.0);
     EXPECT_DOUBLE_EQ(v3[v3.size() - 1], 99.0);
     EXPECT_DOUBLE_EQ(v3.back_pos(), 19);
+
+    // const-версия back() возвращает const T&: только чтение
+    const TVector<double>& cv3 = v3;
+    EXPECT_DOUBLE_EQ(cv3.back(), 99.0);
+
+    static_assert(std::is_same_v<decltype(v.back()), double&>,
+        "non-const back() must return T&");
+    static_assert(std::is_same_v<decltype(cv3.back()), const double&>,
+        "const back() must return const T&");
 }
 
 TEST(ClassVector, throw_when_try_get_front_in_empty_vector) {
@@ -384,12 +402,106 @@ TEST(ClassVector, throw_when_try_get_back_in_empty_vector) {
 TEST(ClassVector, throw_when_try_set_front_in_empty_vector) {
     TVector<double> v;
 
-    EXPECT_THROW(v.set_front() = 1.0, std::out_of_range);
+    EXPECT_THROW(v.front() = 1.0, std::out_of_range);
+
+    const TVector<double>& cv = v;
+    EXPECT_THROW(cv.front(), std::out_of_range);
 }
 
 TEST(ClassVector, throw_when_try_set_back_in_empty_vector) {
     TVector<double> v;
-    EXPECT_THROW(v.set_back() = 1.0, std::out_of_range);
+
+    EXPECT_THROW(v.back() = 1.0, std::out_of_range);
+
+    const TVector<double>& cv = v;
+    EXPECT_THROW(cv.back(), std::out_of_range);
+}
+TEST(ClassVector, can_get_begin) {
+    TVector<double> v = { 1.0, 2.0, 3.0 };
+
+    // begin() указывает на первый логический элемент
+    EXPECT_DOUBLE_EQ(*v.begin(), 1.0);
+    EXPECT_DOUBLE_EQ(*v.begin(), v.front());
+
+    // полный обход через begin()/end() даёт все элементы по порядку
+    size_t i = 0;
+    for (auto it = v.begin(); it != v.end(); ++it, ++i) {
+        EXPECT_DOUBLE_EQ(*it, v[i]);
+    }
+    EXPECT_EQ(i, v.size());
+
+    // пустой вектор: begin() == end()
+    TVector<double> empty;
+    EXPECT_TRUE(empty.begin() == empty.end());
+
+    // после push_front _front != 0: begin() всё равно указывает
+    // на логически первый элемент (проверка кольцевого заворота)
+    TVector<double> v2 = { 1.0, 2.0, 3.0 };
+    v2.push_front(0.0);
+    EXPECT_DOUBLE_EQ(*v2.begin(), 0.0);
+    EXPECT_DOUBLE_EQ(*v2.begin(), v2.front());
+}
+
+TEST(ClassVector, can_get_cbegin) {
+    TVector<double> v = { 1.0, 2.0, 3.0 };
+
+    // cbegin() читает первый элемент
+    EXPECT_DOUBLE_EQ(*v.cbegin(), 1.0);
+
+    // тип возврата — const_iterator (а не iterator)
+    static_assert(std::is_same_v<decltype(v.cbegin()),
+        TVector<double>::const_iterator>,
+        "cbegin() must return const_iterator");
+
+    // пустой: cbegin() == cend()
+    TVector<double> empty;
+    EXPECT_TRUE(empty.cbegin() == empty.cend());
+}
+
+TEST(ClassVector, can_get_end) {
+    TVector<double> v = { 1.0, 2.0, 3.0 };
+
+    // end() — sentinel «после последнего»: (end() - 1) == последний
+    EXPECT_DOUBLE_EQ(*(v.end() - 1), v.back());
+    EXPECT_DOUBLE_EQ(*(v.end() - 1), 3.0);
+
+    // end() - begin() == size()
+    EXPECT_EQ(v.end() - v.begin(),
+        static_cast<std::ptrdiff_t>(v.size()));
+
+    // пустой: end() == begin()
+    TVector<double> empty;
+    EXPECT_TRUE(empty.end() == empty.begin());
+
+    // обратный обход через -- работает корректно
+    size_t i = v.size();
+    for (auto it = v.end(); it != v.begin(); ) {
+        --it;
+        --i;
+        EXPECT_DOUBLE_EQ(*it, v[i]);
+    }
+    EXPECT_EQ(i, 0u);
+}
+
+TEST(ClassVector, can_get_cend) {
+    TVector<double> v = { 1.0, 2.0, 3.0 };
+
+    // тип возврата — const_iterator
+    static_assert(std::is_same_v<decltype(v.cend()),
+        TVector<double>::const_iterator>,
+        "cend() must return const_iterator");
+
+    // cend() - cbegin() == size()
+    EXPECT_EQ(v.cend() - v.cbegin(),
+        static_cast<std::ptrdiff_t>(v.size()));
+
+    // (cend() - 1) указывает на последний элемент
+    EXPECT_DOUBLE_EQ(*(v.cend() - 1), v.back());
+
+
+    // пустой: cend() == cbegin()
+    TVector<double> empty;
+    EXPECT_TRUE(empty.cbegin() == empty.cend());
 }
 
 TEST(ClassVector, can_push_front) {
