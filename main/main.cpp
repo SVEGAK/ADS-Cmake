@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include "../lib_easy_example/easy_example.h"
+#include "../lib_algorithms/algorithms.h"
 
 int main() {
   int a, b;

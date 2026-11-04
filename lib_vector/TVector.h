@@ -3,9 +3,11 @@
 #ifndef LIB_VECTOR_TVECTOR_H_
 #define LIB_VECTOR_TVECTOR_H_
 
-#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <ctime>
+#include <initializer_list>
 #include <iostream>
-#include <random>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -18,7 +20,7 @@ class TVector {
     size_t _front;     // индекс первого элемента
     size_t _back;      // индекс последнего элемента
 
- public:
+public:
     explicit TVector(size_t size = 0);  // конструктор по размеру
     TVector(std::initializer_list<T>);  // конструктор по списку
     TVector(T* list, size_t size);      // конструктор инициализации
@@ -26,39 +28,39 @@ class TVector {
     TVector(TVector&& other) noexcept;  // конструктор с move
     ~TVector() = default;               // деструктор
 
-    inline bool is_empty() const noexcept;    // проверка на пустоту
-    inline bool is_full() const noexcept;     // проверка на переполнение
+    inline bool is_empty() const noexcept;  // проверка на пустоту
+    inline bool is_full() const noexcept;   // проверка на переполнение
 
-    inline void compress() noexcept;          // сжатие буфера
-    inline void shrink_to_fit() noexcept;     // capacity = size
+    inline void compress() noexcept;  // сжатие буфера
+    inline void shrink_to_fit();      // освобождение лишней памяти
     inline size_t size() const noexcept;      // геттер размера
     inline size_t capacity() const noexcept;  // геттер вместимости
-    inline T front() const;                   // геттер первого
-    inline T back() const;                    // геттер последнего
+    inline T front() const;                   // геттер первого элемента
+    inline T back() const;                    // геттер последнего элемента
     inline size_t front_pos() const;          // геттер индекса первого
     inline size_t back_pos() const;           // геттер индекса последнего
 
-    inline T& set_front();  // сеттер первого
-    inline T& set_back();   // сеттер последнего
+    inline T& set_front();  // сеттер первого элемента
+    inline T& set_back();   // сеттер последнего элемента
 
-    void push_front(T elem) noexcept;       // вставка в начало
-    void push_back(T elem) noexcept;        // вставка в конец
-    void insert(T elem, size_t pos);        // вставка по позиции
-    void push_when_empty(T elem) noexcept;  // вставка в пустой
-    inline void size_decrease() noexcept;   // уменьшение size
-    inline void size_increase() noexcept;   // увеличение size
-    void pop_front();                       // удаление из начала
-    void pop_back();                        // удаление из конца
-    void erase(size_t pos);                 // удаление по позиции
+    void push_front(T elem);        // вставка элемента в начало
+    void push_back(T elem);         // вставка элемента в конец
+    void insert(T elem, size_t pos);  // вставка элемента по позиции
+    void push_when_empty(T elem);   // вспомогательная функция для вставки
+    inline void size_decrease() noexcept;  // уменьшение size
+    inline void size_increase() noexcept;  // увеличение size
+    void pop_front();               // удаление элемента из начала
+    void pop_back();                // удаление элемента из конца
+    void erase(size_t pos);         // удаление элемента по позиции
     void shuffle() noexcept;
     void quicksort(int low, int high) noexcept;
     int partition(int low, int high) noexcept;
 
     TVector& operator=(const TVector& other) noexcept;  // присваивание
-    TVector& operator=(TVector&& other) noexcept;       // присваивание move
+    TVector& operator=(TVector&& other) noexcept;  // присваивание move
 
-    T operator[](size_t pos) const noexcept;  // оператор индекса const
-    T& operator[](size_t pos) noexcept;       // оператор индекса
+    const T& operator[](size_t pos) const;  // константный operator[]
+    T& operator[](size_t pos);              // operator[]
 
     friend std::ostream& operator<<(std::ostream& os,
         const TVector<T>& v) {  // вывод
@@ -86,10 +88,10 @@ class TVector {
         return is;
     }
 
-    void push_back_n(const T* values, size_t n);           // n в конец
-    void push_front_n(const T* values, size_t n);          // n в начало
-    void insert_n(size_t pos, const T* values, size_t n);  // n в pos
-    void erase_n(size_t pos, size_t n);                    // удалить n
+    void push_back_n(const T* values, size_t n);   // вставка n в конец
+    void push_front_n(const T* values, size_t n);  // вставка n в начало
+    void insert_n(size_t pos, const T* values, size_t n);  // вставка n
+    void erase_n(size_t pos, size_t n);  // удаление n элементов
 };
 
 template <typename T>
@@ -112,7 +114,7 @@ inline void TVector<T>::compress() noexcept {
 }
 
 template <typename T>
-inline void TVector<T>::shrink_to_fit() noexcept {
+inline void TVector<T>::shrink_to_fit() {
     if (size() != capacity()) {
         _mem.reset_memory(size(), _front, 0, false);
         _front = 0;
@@ -169,7 +171,8 @@ inline void TVector<T>::size_increase() noexcept {
 template <typename T>
 inline T& TVector<T>::set_front() {
     if (is_empty()) {
-        throw std::out_of_range("Vector::front() called on empty vector");
+        throw std::out_of_range(
+            "Vector::front() called on empty vector");
     }
     return _mem._data[_front];
 }
@@ -177,29 +180,21 @@ inline T& TVector<T>::set_front() {
 template <typename T>
 inline T& TVector<T>::set_back() {
     if (is_empty()) {
-        throw std::out_of_range("Vector::back() called on empty vector");
+        throw std::out_of_range(
+            "Vector::back() called on empty vector");
     }
     return _mem._data[_back];
 }
 
 template <typename T>
-TVector<T>::TVector(size_t size) {  // конструктор по умолчанию и размеру
-    TMemData<T> object(size);
-    _front = 0;
-    if (size == 0) {
-        _back = size;
-    }else {
-        _back = size - 1;
-    }
-    _mem = object;
+TVector<T>::TVector(size_t size)
+    : _mem(size), _front(0), _back((size > 0) ? size - 1 : 0) {
 }
 
 template <typename T>
-TVector<T>::TVector(std::initializer_list<T> list) {
+TVector<T>::TVector(std::initializer_list<T> list) : _mem(list) {
     _front = 0;
-    TMemData<T> md(list);
-    _mem = md;
-    _back = list.size() - 1;
+    _back = (list.size() > 0) ? size() - 1 : 0;
 }
 
 template <typename T>
@@ -209,7 +204,8 @@ TVector<T>::TVector(T* list, size_t size) {
     _mem = mem;
     if (size == 0) {
         _back = size;
-    }else {
+    }
+    else {
         _back = size - 1;
     }
 }
@@ -226,8 +222,7 @@ template <typename T>
 TVector<T>::TVector(TVector&& other) noexcept {
     _front = other._front;
     _back = other._back;
-    TMemData<T> mem(std::move(other._mem));
-    _mem = mem;
+    _mem = std::move(other._mem);
     other._front = 0;
     other._back = 0;
 }
@@ -237,7 +232,7 @@ TVector<T>& TVector<T>::operator=(const TVector& other) noexcept {
     _front = other._front;
     _back = other._back;
     _mem = other._mem;
-    return (*this);
+    return *this;
 }
 
 template <typename T>
@@ -247,24 +242,32 @@ TVector<T>& TVector<T>::operator=(TVector&& other) noexcept {
     _mem = std::move(other._mem);
     other._front = 0;
     other._back = 0;
-    return (*this);
+    return *this;
 }
 
 template <typename T>
-T TVector<T>::operator[](size_t pos) const noexcept {
+const T& TVector<T>::operator[](size_t pos) const {
+    if (this->is_empty()) {
+        throw std::logic_error(
+            "Can't apply [] operator to empty vector: size = 0.");
+    }
     pos = (pos + _front) % capacity();
     return _mem._data[pos];
 }
 
 template <typename T>
-T& TVector<T>::operator[](size_t pos) noexcept {
+T& TVector<T>::operator[](size_t pos) {
+    if (this->is_empty()) {
+        throw std::logic_error(
+            "Can't apply [] operator to empty vector: size = 0.");
+    }
     pos = (pos + _front) % capacity();
-    return (_mem._data[pos]);
+    return _mem._data[pos];
 }
 
 template <typename T>
-void TVector<T>::push_back(T elem) noexcept {
-    if ((size() == 0) || is_empty()) {  // если объект пуст или nullptr
+void TVector<T>::push_back(T elem) {
+    if ((size() == 0) || is_empty()) {  // объект пуст или nullptr
         push_when_empty(elem);
         return;
     }
@@ -272,28 +275,28 @@ void TVector<T>::push_back(T elem) noexcept {
         // просто сдвигаем массив влево, если есть свободное место
         _mem.reset_memory(size() + 1, _front, 0);
         _front = 0;
-        _back = _front + size() - 1;
+        _back = (_mem._size > 0) ? _front + size() - 1 : 0;
         _mem._data[_back] = elem;
         return;
-    }else if (is_full()) {
-        // выделяем буфер
-        _mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
-        _front = FRONT_BUFFER;
-        _back = _front + size() - 1;  // пересчитываю back
-        _mem._data[_back] = elem;     // ставлю элемент в новую ячейку
+    }
+    else if (is_full()) {
+        _mem.reset_memory(size() + 1, _front);
+        _front = 0;
+        _back = (_mem._size > 0) ? _front + size() - 1 : 0;
+        _mem._data[_back] = elem;
         return;
     }
     _back++;
     _mem._data[_back] = elem;
     size_increase();
-    return;
 }
 
 template <typename T>
 void TVector<T>::insert(T elem, size_t pos) {
     if (pos > size()) {
         throw std::out_of_range(
-            "Insert position must be in [0;" + std::to_string(size()) + "].");
+            "Insert position must be in [0;" + std::to_string(size()) +
+            "].");
     }
 
     if (is_empty() || size() == 0) {
@@ -302,10 +305,11 @@ void TVector<T>::insert(T elem, size_t pos) {
     }
 
     if (is_full()) {
-        _mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
-        _front = FRONT_BUFFER;
-        _back = _front + size() - 1;
-    }else {
+        _mem.reset_memory(size() + 1, _front);
+        _front = 0;
+        _back = (_mem._size > 0) ? _front + size() - 1 : 0;
+    }
+    else {
         size_increase();
         _back++;
     }
@@ -315,42 +319,39 @@ void TVector<T>::insert(T elem, size_t pos) {
         _mem._data[i] = _mem._data[i - 1];
     }
     _mem._data[phys_pos] = elem;
-    return;
 }
 
 template <typename T>
-void TVector<T>::push_front(T elem) noexcept {
-    if ((size() == 0) || (is_empty())) {  // если объект пуст
+void TVector<T>::push_front(T elem) {
+    if ((size() == 0) || is_empty()) {  // объект пуст
         push_when_empty(elem);
         return;
     }
-    if ((is_full()) || (_front == _back) || (_front == 0)) {
+    if (is_full() || (_front == _back) || (_front == 0)) {
         // увеличиваем на 1 ячейку size + выделяем буфер
-        _mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
-        _front = FRONT_BUFFER - 1;  // берём элемент перед первым
-        _back = _front + size() - 1;
-        (*this)[0] = elem;
+        _mem.reset_memory(size() + 1, _front, 1);
+        _front = 0;
+        _back = (_mem._size > 0) ? _front + size() - 1 : 0;
+        _mem._data[_front] = std::move(elem);
         return;
     }
     _front--;
-    (*this)[0] = elem;
+    _mem._data[_front] = std::move(elem);
     size_increase();
-    return;
 }
 
 template <typename T>
-void TVector<T>::push_when_empty(T elem) noexcept {
+void TVector<T>::push_when_empty(T elem) {
     _front = 0;
-    _mem.set_memory(_front);
-    _back = _front;
-    (*this)[0] = elem;
+    _back = 0;
+    _mem.set_memory(1);
+    _mem._data[_front] = std::move(elem);
     size_increase();
-    return;
 }
 
 template <typename T>
 void TVector<T>::pop_front() {
-    if ((_mem.size() == 0) || (*this).is_empty()) {  // пуст или nullptr
+    if ((_mem.size() == 0) || is_empty()) {  // объект пуст или nullptr
         throw std::out_of_range("Can't pop empty list.");
     }
     (*this)[0] = T();
@@ -361,7 +362,7 @@ void TVector<T>::pop_front() {
 
 template <typename T>
 void TVector<T>::pop_back() {
-    if (((*this).size() == 0) || (*this).is_empty()) {  // пуст или nullptr
+    if ((size() == 0) || is_empty()) {  // объект пуст или nullptr
         throw std::out_of_range("Can't pop empty list.");
     }
     if (_back == 0) {
@@ -370,7 +371,8 @@ void TVector<T>::pop_back() {
         size_decrease();
         compress();
         return;
-    }else if (_back < 0) {
+    }
+    else if (_back < 0) {
         throw std::out_of_range("back pos element out of massive.");
     }
     _mem._data[_back] = T();
@@ -386,17 +388,18 @@ void TVector<T>::erase(size_t pos) {  // pos - логический индекс
             "Pop position must be in [" + std::to_string(0) + ';' +
             std::to_string(size() - 1) + "].");
     }
-    if (((*this).is_empty())) {  // если буфер пуст (в т. ч. nullptr)
+    if (is_empty()) {  // учитываем, если буфер пуст
         throw std::out_of_range("Can't pop empty list.");
     }
     if (pos == 0) {
-        (*this).pop_front();
-        return;
-    }else if (pos == (_mem._size - 1)) {
-        (*this).pop_back();
+        pop_front();
         return;
     }
-    for (size_t i = pos; i < size() - 1; i++) {  // сдвиг элементов влево
+    else if (pos == (_mem._size - 1)) {
+        pop_back();
+        return;
+    }
+    for (size_t i = pos; i < size() - 1; i++) {  // сдвиг влево
         (*this)[i] = (*this)[i + 1];
     }
     _mem.reset_memory(_mem._size - 1, _front, 0);
@@ -406,14 +409,14 @@ void TVector<T>::erase(size_t pos) {  // pos - логический индекс
 
 template <typename T>
 void TVector<T>::shuffle() noexcept {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
     // Алгоритм Фишера-Йетса
-    srand(static_cast<unsigned>(time(nullptr)));
     if (is_empty()) {
         return;
     }
     T t;
     for (size_t i = size() - 1; i > 0; i--) {
-        size_t j = rand() % (i + 1);
+        size_t j = std::rand() % (i + 1);
         t = (*this)[j];
         (*this)[j] = (*this)[i];
         (*this)[i] = t;
@@ -432,9 +435,10 @@ void TVector<T>::quicksort(int low, int high) noexcept {
 template <typename T>
 int TVector<T>::partition(int high, int low) noexcept {
     // опорный элемент [low; high]
-    int pivot = (*this)[rand() % (high - low + 1) + low];
-    low--;   // чтобы начать с начала и использовать do while
+    int pivot = (*this)[std::rand() % (high - low + 1) + low];
+    low--;
     high++;
+    // чтобы начать с начала и использовать при этом do while
     while (true) {
         do {
             low++;
@@ -457,7 +461,7 @@ void TVector<T>::push_back_n(const T* values, size_t n) {
         return;
     }
     for (size_t i = 0; i < n; i++) {
-        (*this).push_back(values[i]);
+        push_back(values[i]);
     }
 }
 
@@ -468,10 +472,10 @@ void TVector<T>::push_front_n(const T* values, size_t n) {
     }
     for (size_t i = 0; i < n; i++) {
         if (i == 0) {
-            (*this).push_front(values[0]);
+            push_front(values[0]);
             continue;
         }
-        (*this).insert(values[i], i);
+        insert(values[i], i);
     }
 }
 
@@ -489,7 +493,7 @@ void TVector<T>::insert_n(size_t pos, const T* values, size_t n) {
         return;
     }
     for (size_t i = 0; i < n; i++) {
-        (*this).insert(values[i], pos + i);
+        insert(values[i], pos + i);
     }
 }
 

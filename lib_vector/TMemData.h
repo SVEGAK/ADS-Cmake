@@ -3,10 +3,10 @@
 #ifndef LIB_VECTOR_TMEMDATA_H_
 #define LIB_VECTOR_TMEMDATA_H_
 
+#include <cstddef>
 #include <initializer_list>
 
 #define MEM_STEP 15
-#define FRONT_BUFFER 5
 
 template <typename T>
 class TVector;
@@ -17,20 +17,20 @@ class TMemData {
     size_t _size;      // размер заполненной части хранилища
     size_t _capacity;  // вместимость хранилища
 
- public:
-    explicit TMemData(size_t size = 0);        // конструктор по размеру
-    TMemData(std::initializer_list<T> list);   // конструктор по списку
-    TMemData(T* data, size_t size);            // конструктор инициализации
-    TMemData(const TMemData& other);           // конструктор копирования
-    TMemData(TMemData&& other) noexcept;       // конструктор с move
-    ~TMemData();                               // деструктор
+public:
+    explicit TMemData(size_t size = 0);  // конструктор по размеру
+    TMemData(std::initializer_list<T> list);  // конструктор по списку
+    TMemData(T* data, size_t size);  // конструктор инициализации
+    TMemData(const TMemData& other);  // конструктор копирования
+    TMemData(TMemData&& other) noexcept;  // конструктор с move
+    ~TMemData();  // деструктор
 
     inline bool is_empty() const noexcept;  // проверка на пустоту
-    inline bool is_full() const noexcept;   // проверка на переполнение
+    inline bool is_full() const noexcept;  // проверка на переполнение
     inline size_t calculate_capacity(size_t size);
 
-    inline size_t size() const noexcept;          // геттер размера
-    inline size_t capacity() const noexcept;      // геттер вместимости
+    inline size_t size() const noexcept;  // геттер размера
+    inline size_t capacity() const noexcept;  // геттер вместимости
     inline const T* const data() const noexcept;  // геттер хранилища
 
     // установка памяти без сохранения данных
@@ -38,10 +38,10 @@ class TMemData {
     // перевыделение памяти с сохранением данных
     void reset_memory(size_t size, size_t start_index = 0,
         size_t placement_offset = 0,
-        bool cap_calculation = true) noexcept;
+        bool cap_calculation = true);
     inline void clear_memory() noexcept;  // очистка памяти
 
-    TMemData& operator=(const TMemData& other);      // присваивание
+    TMemData& operator=(const TMemData& other);  // присваивание
     TMemData& operator=(TMemData&& other) noexcept;  // присваивание move
 
     friend class TVector<T>;
@@ -49,7 +49,7 @@ class TMemData {
 
 template <typename T>
 inline bool TMemData<T>::is_empty() const noexcept {
-    return _size == 0 || _data == nullptr;
+    return _size == 0;
 }
 
 template <typename T>
@@ -77,6 +77,8 @@ template <typename T>
 inline void TMemData<T>::clear_memory() noexcept {
     delete[] _data;
     _data = nullptr;
+    _size = 0;
+    _capacity = 0;
 }
 
 template <typename T>
@@ -87,24 +89,27 @@ inline size_t TMemData<T>::calculate_capacity(size_t size) {
     if (size <= MEM_STEP) {
         return MEM_STEP;
     }
-    return (size + MEM_STEP);
+    return size + MEM_STEP;
 }
 
 template <typename T>
 TMemData<T>::TMemData(size_t size) {
+    _size = size;
     _capacity = calculate_capacity(size);
-    _size = 0;
     _data = new T[_capacity];
+    for (size_t i = 0; i < _capacity; ++i) {
+        _data[i] = T();  // значение по умолчанию
+    }
 }
 
 template <typename T>
 TMemData<T>::TMemData(std::initializer_list<T> list) {
     _size = list.size();
     _capacity = _size;
-    _data = new T[_capacity];
+    _data = new T[_size];
     const T* list_begin_p = list.begin();
     for (size_t i = 0; i < _size; i++) {
-        _data[i] = *(list_begin_p + i);
+        _data[i] = list_begin_p[i];
     }
 }
 
@@ -119,12 +124,12 @@ TMemData<T>::TMemData(T* data, size_t size) {
 }
 
 template <typename T>
-TMemData<T>::TMemData(const TMemData& TMemData) {
-    _size = TMemData._size;
-    _capacity = TMemData._capacity;
+TMemData<T>::TMemData(const TMemData& other) {
+    _size = other._size;
+    _capacity = other._capacity;
     _data = new T[_capacity];
     for (size_t i = 0; i < _size; i++) {
-        _data[i] = TMemData._data[i];
+        _data[i] = other._data[i];
     }
 }
 
@@ -151,54 +156,61 @@ void TMemData<T>::set_memory(size_t size) noexcept {
     _capacity = calculate_capacity(size);
     delete[] _data;
     _data = new T[_capacity];
+    for (size_t i = 0; i < _capacity; i++) {
+        _data[i] = T();
+    }
 }
 
-// start_index - индекс начала элементов в старом массиве
 template <typename T>
 void TMemData<T>::reset_memory(size_t size, size_t start_index,
-    size_t placement_offset,
-    bool cap_calculation) noexcept {
+    size_t placement_offset, bool cap_calculation) {
     T* old_data = _data;
-    _capacity = (cap_calculation) ? calculate_capacity(size) : size;
+    size_t old_capacity = _capacity;
+    size_t old_size = _size;
+
+    _capacity = cap_calculation ? calculate_capacity(size) : size;
     _data = new T[_capacity];
-    if (size > _size) {
-        for (size_t i = 0; i < _size; i++) {
-            _data[i + placement_offset] = old_data[i + start_index];
-        }
-    }else {  // size <= _size
-        for (size_t i = 0; i < size; i++) {
-            _data[i + placement_offset] = old_data[i + start_index];
+    for (size_t i = 0; i < _capacity; ++i) {
+        _data[i] = T();
+    }
+
+    size_t count = (size > old_size) ? old_size : size;
+    if (count > 0 && old_capacity > 0) {
+        for (size_t i = 0; i < count; ++i) {
+            size_t src = (start_index + i) % old_capacity;  // обход кольца
+            _data[i + placement_offset] = old_data[src];
         }
     }
+
     _size = size;
     delete[] old_data;
-    return;
 }
 
 template <typename T>
 TMemData<T>& TMemData<T>::operator=(const TMemData& other) {
     if (this != &other) {
-        (*this)._size = other._size;
-        (*this)._capacity = other._capacity;
-        (*this)._data = new T[(*this)._capacity];
-        for (size_t i = 0; i < _capacity; i++) {
-            (*this)._data[i] = other._data[i];
+        delete[] _data;
+        _size = other._size;
+        _capacity = other._capacity;
+        _data = new T[_capacity];
+        for (size_t i = 0; i < _size; i++) {
+            _data[i] = other._data[i];
         }
     }
-    return (*this);
+    return *this;
 }
 
 template <typename T>
 TMemData<T>& TMemData<T>::operator=(TMemData&& other) noexcept {
     if (this != &other) {
-        (*this)._size = other._size;
-        (*this)._capacity = other._capacity;
-        (*this)._data = other._data;
+        _size = other._size;
+        _capacity = other._capacity;
+        _data = other._data;
         other._size = 0;
         other._capacity = 0;
         other._data = nullptr;
     }
-    return (*this);
+    return *this;
 }
 
 #endif  // LIB_VECTOR_TMEMDATA_H_
