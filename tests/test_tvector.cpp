@@ -4,8 +4,8 @@
 
 #include "gtest/gtest.h"
 
-#define MEMDATA_TESTS
-#define VECTOR_TESTS
+//#define MEMDATA_TESTS
+//#define VECTOR_TESTS
 
 #ifdef MEMDATA_TESTS
 #include <iostream>

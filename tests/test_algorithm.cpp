@@ -1,9 +1,14 @@
-// Copyright 2024 Marina Usova
+// Copyright 2026 SVEGAK/Novikov R
 
 #include <gtest/gtest.h>
-#include "algorithms.cpp"
 
+#define ALGORITHMS_TESTS
+
+
+#ifdef ALGORITHMS_TESTS
 #define EPSILON 0.000001
+
+#include "algorithms.cpp"
 
 TEST(TestEasyExampleLib, can_div) {
   // Arrange
@@ -69,3 +74,5 @@ TEST(TestCheckBreckets, extra_opened_brekets) {
     std::string input = "( [ { } ] ) (";
     EXPECT_FALSE(check_breckets(input));
 }
+
+#endif //ALGORITHMS_TESTS
