@@ -17,6 +17,7 @@ add_subdirectory(lib_algorithms)      # подключаем дополните�
 add_subdirectory(lib_vector)          # подключаем дополнительный CMakeLists.txt из подкаталога с именем lib_vector
 add_subdirectory(main)                # подключаем дополнительный CMakeLists.txt из подкаталога с именем main
 add_subdirectory(lib_stack_on_mass)   # подключаем дополнительный CMakeLists.txt из подкаталога с именем lib_stack_on_mass
+add_subdirectory(lib_queue)   # подключаем дополнительный CMakeLists.txt из подкаталога с именем lib_stack_on_mass
 
 option(BTEST "build test?" YES)        # указываем подключаем ли google-тесты (ON или YES) или нет (OFF или NO)
 
