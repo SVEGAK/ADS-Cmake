@@ -18,7 +18,10 @@ class TStackOnMass {
 	 void push(const T&);
 	 T pop();
 	 T& top();
+	 T& bottom();//Для QueueOnStacks
+	 size_t size() const noexcept;
 	 const T& top() const;
+	 const T& bottom() const;
 	 inline bool is_empty() const noexcept;
 	 inline bool is_full() const noexcept;
 
@@ -87,6 +90,30 @@ inline T& TStackOnMass<T>::top()
 }
 
 template<typename T>
+inline T& TStackOnMass<T>::bottom()
+{
+	if (is_empty()) {
+		throw std::logic_error("Stack is empty");
+	}
+	return _data[0];
+}
+
+template<typename T>
+inline const T& TStackOnMass<T>::bottom() const
+{
+	if (is_empty()) {
+		throw std::logic_error("Stack is empty");
+	}
+	return _data[0];
+}
+
+template<typename T>
+inline size_t TStackOnMass<T>::size() const noexcept
+{
+	return static_cast<size_t>(_top+1);
+}
+
+template<typename T>
 inline const T& TStackOnMass<T>::top() const
 {
 	if (is_empty()) {
@@ -94,6 +121,5 @@ inline const T& TStackOnMass<T>::top() const
 	}
 	return _data[_top];
 }
-
 
 #endif // LIB_STACK_ON_MASS_H

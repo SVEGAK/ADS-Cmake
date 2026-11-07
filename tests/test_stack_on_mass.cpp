@@ -163,4 +163,79 @@ TEST(TStackOnMassSizeOne, PushPopCycle) {
     EXPECT_TRUE(s.is_empty());
 }
 
+
+TEST(TStackOnMassSize, InitiallyZero) {
+    TStackOnMass<int> s(5);
+    EXPECT_EQ(s.size(), 0u);
+}
+
+TEST(TStackOnMassSize, GrowsWithPush) {
+    TStackOnMass<int> s(5);
+    s.push(10);
+    EXPECT_EQ(s.size(), 1u);
+    s.push(20);
+    s.push(30);
+    EXPECT_EQ(s.size(), 3u);
+}
+
+TEST(TStackOnMassSize, EqualsFullWhenFull) {
+    TStackOnMass<int> s(4);
+    for (int i = 0; i < 4; ++i) s.push(i);
+    EXPECT_TRUE(s.is_full());
+    EXPECT_EQ(s.size(), 4u);
+}
+
+TEST(TStackOnMassSize, CopyHasSameSize) {
+    TStackOnMass<int> a(5);
+    a.push(1);
+    a.push(2);
+    a.push(3);
+    TStackOnMass<int> b(a);
+    EXPECT_EQ(b.size(), a.size());
+    EXPECT_EQ(b.size(), 3u);
+    // независимость
+    b.pop();
+    EXPECT_EQ(b.size(), 2u);
+    EXPECT_EQ(a.size(), 3u);
+}
+
+TEST(TStackOnMassBottom, SingleElement) {
+    TStackOnMass<int> s(3);
+    s.push(42);
+    EXPECT_EQ(s.bottom(), 42);
+    EXPECT_EQ(s.top(), 42);
+}
+
+TEST(TStackOnMassBottom, ReturnsOldestNotTop) {
+    TStackOnMass<int> s(5);
+    s.push(1);
+    s.push(2);
+    s.push(3);
+    EXPECT_EQ(s.bottom(), 1);   // самый старый
+    EXPECT_EQ(s.top(), 3);      // самый новый
+}
+
+TEST(TStackOnMassBottom, SurvivesPushPopOnTop) {
+    TStackOnMass<int> s(5);
+    s.push(1);
+    s.push(2);
+    s.push(3);
+    s.pop();                    // убрали 3
+    s.push(4);                  // положили 4
+    EXPECT_EQ(s.bottom(), 1);   // низ не тронут
+    EXPECT_EQ(s.top(), 4);
+}
+
+TEST(TStackOnMassBottom, EmptyThrows) {
+    TStackOnMass<int> s(3);
+    EXPECT_THROW(s.bottom(), std::logic_error);
+}
+
+TEST(TStackOnMassBottom, BecomesValidAfterFirstPush) {
+    TStackOnMass<int> s(3);
+    EXPECT_THROW(s.bottom(), std::logic_error);
+    s.push(7);
+    EXPECT_EQ(s.bottom(), 7);
+}
+
 #endif //STACK_ON_MASS_TESTS
