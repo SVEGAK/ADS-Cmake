@@ -70,7 +70,7 @@ inline const T& TQueueOnStacks<T>::front() const
 		return _out.top();
 	}
 	if (!_in.is_empty()) {
-		return _in.bottom()
+		return _in.bottom();
 	}
 	throw std::logic_error("Queue is empty.");
 }
@@ -81,7 +81,7 @@ inline T& TQueueOnStacks<T>::front()
 		return _out.top();
 	}
 	if (!_in.is_empty()) {
-		return _in.bottom()
+		return _in.bottom();
 	}
 	throw std::logic_error("Queue is empty.");
 	

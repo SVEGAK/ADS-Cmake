@@ -172,17 +172,17 @@ TEST(TStackOnMassSize, InitiallyZero) {
 TEST(TStackOnMassSize, GrowsWithPush) {
     TStackOnMass<int> s(5);
     s.push(10);
-    EXPECT_EQ(s.size(), 1u);
+    EXPECT_EQ(s.size(), 1);
     s.push(20);
     s.push(30);
-    EXPECT_EQ(s.size(), 3u);
+    EXPECT_EQ(s.size(), 3);
 }
 
 TEST(TStackOnMassSize, EqualsFullWhenFull) {
     TStackOnMass<int> s(4);
-    for (int i = 0; i < 4; ++i) s.push(i);
+    for (int i = 0; i < 4; i++) s.push(i);
     EXPECT_TRUE(s.is_full());
-    EXPECT_EQ(s.size(), 4u);
+    EXPECT_EQ(s.size(), 4);
 }
 
 TEST(TStackOnMassSize, CopyHasSameSize) {
@@ -192,11 +192,11 @@ TEST(TStackOnMassSize, CopyHasSameSize) {
     a.push(3);
     TStackOnMass<int> b(a);
     EXPECT_EQ(b.size(), a.size());
-    EXPECT_EQ(b.size(), 3u);
+    EXPECT_EQ(b.size(), 3);
     // независимость
     b.pop();
-    EXPECT_EQ(b.size(), 2u);
-    EXPECT_EQ(a.size(), 3u);
+    EXPECT_EQ(b.size(), 2);
+    EXPECT_EQ(a.size(), 3);
 }
 
 TEST(TStackOnMassBottom, SingleElement) {
