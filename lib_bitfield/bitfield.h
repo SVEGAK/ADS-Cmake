@@ -6,7 +6,12 @@
 #include <cstddef>
 #include <iostream>
 #include <climits> //Для CHAR_BITS
+#include <algorithm>
+namespace {
 
+	constexpr size_t kBlockLength = sizeof(unsigned int) * CHAR_BIT;  //Кол-во битов в 1 блоке _data[i]
+
+}  
 class BitField {
 	unsigned int* _data; 
 	size_t _size; // max мощность множества (количество элементов = кол-во блоков * sizeof(каждого блока)
@@ -14,7 +19,7 @@ class BitField {
 
 	unsigned int get_mask(size_t pos); //Получение маски
 	size_t get_index(size_t pos) const; // Преобразование позиции в индекс
-	size_t blocks(size_t bits);//Динамическая функция вычисления числа блоков (фактически длины массива)
+	size_t blocks(size_t bits) const;//Динамическая функция вычисления числа блоков (фактически длины массива)
 
 	public:
 		BitField(size_t size = 0);
@@ -26,7 +31,7 @@ class BitField {
 		void reset_bit(size_t pos);
 		bool get_bit(size_t pos) const;
 
-		size_t size(); // Геттер мощности множества
+		size_t size() const noexcept; // Геттер мощности множества
 
 		BitField& operator=(const BitField& other);
 		BitField& operator=(BitField&& other) noexcept;
