@@ -11,7 +11,7 @@ class TStackOnMass {
   size_t _size;
   int _top;  // Индекс последнего элемента
  public:
-  TStackOnMass(size_t size);
+  explicit TStackOnMass(size_t size);
   TStackOnMass(const TStackOnMass& other);
   ~TStackOnMass();
 

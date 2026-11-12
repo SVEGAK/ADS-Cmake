@@ -7,6 +7,8 @@
 #ifdef ALGORITHMS_TESTS
 #define EPSILON 0.000001
 
+#include <string>
+
 #include "../lib_algorithms/algorithms.cpp"  // NOLINT(build/include)
 
 TEST(TestEasyExampleLib, can_div) {

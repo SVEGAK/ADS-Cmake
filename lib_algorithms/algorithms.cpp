@@ -3,6 +3,7 @@
 #include "../lib_algorithms/algorithms.h"
 
 #include <stdexcept>
+#include <string>
 
 float division(int a, int b) {
   if (b == 0) {

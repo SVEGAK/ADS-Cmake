@@ -100,12 +100,12 @@ class TVector {
    public:
     Iterator(Type* ptr = nullptr, size_t pos = 0, size_t front = 0,
              size_t capacity = 0)
-        : _data(ptr), _pos(pos), _front(front), _capacity(capacity) {};
+        : _data(ptr), _pos(pos), _front(front), _capacity(capacity) {}
     Iterator(const Iterator& other)
         : _data(other._data),
           _pos(other._pos),
           _front(other._front),
-          _capacity(other._capacity) {};
+          _capacity(other._capacity) {}
     Type& operator*() const {
       if ((_capacity == 0) || (_data == nullptr)) {
         throw std::logic_error(

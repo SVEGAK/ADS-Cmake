@@ -1,14 +1,15 @@
 // Copyright 2026 SVEGAK/Novikov R
 
-#ifndef LIB_QUEUE_ON_STACKS
-#define LIB_QUEUE_ON_STACKS
+#ifndef LIB_QUEUE_QUEUE_H_
+#define LIB_QUEUE_QUEUE_H_
 
 #include <exception>
 
 #include "../lib_stack_on_mass/stack_on_mass.h"
 // Очередь реализована двумя стеками:
 // _in стек куда вводятся новые элементы
-// _out стек в который переворачиваются и переносятся элементы из _in (если _out пуст)
+// _out стек в который переворачиваются и переносятся элементы из _in (если _out
+// пуст)
 
 template <typename T>
 class TQueueOnStacks {
@@ -23,9 +24,9 @@ class TQueueOnStacks {
   }
 
  public:
-  TQueueOnStacks(size_t size) : _in(size), _out(size) {};
+  explicit TQueueOnStacks(size_t size) : _in(size), _out(size) {}
   TQueueOnStacks(const TQueueOnStacks& other)
-      : _in(other._in), _out(other._out) {};
+      : _in(other._in), _out(other._out) {}
   ~TQueueOnStacks() = default;
 
   void enqueue(const T&);  // Добавление элемента в очередь
@@ -119,4 +120,4 @@ inline bool TQueueOnStacks<T>::is_full() const noexcept {
   return (!_out.is_empty() && _in.is_full());
 }
 
-#endif  // LIB_QUEUE_ON_STACKS
+#endif  // LIB_QUEUE_QUEUE_H_

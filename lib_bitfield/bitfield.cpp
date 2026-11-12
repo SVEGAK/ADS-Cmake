@@ -9,11 +9,12 @@
 
 namespace bitfield_detail {
 
-constexpr size_t kBlockLength = sizeof(unsigned int) * CHAR_BIT; // Кол-во битов в 1 блоке _data[i]
+// Количество битов в одном блоке _data[i]
+constexpr size_t kBlockLength = sizeof(unsigned int) * CHAR_BIT;
 
 }  // namespace bitfield_detail
 
-using namespace bitfield_detail;
+using bitfield_detail::kBlockLength;
 
 unsigned int BitField::get_mask(size_t pos) {
   if (pos >= _size) {
