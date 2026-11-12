@@ -4,5 +4,5 @@
 // #define QUEUE_TESTS
 
 #ifdef QUEUE_TESTS
-#include "queue.h"
+#include "../lib_queue/queue.h"
 #endif  // QUEUE_TESTS

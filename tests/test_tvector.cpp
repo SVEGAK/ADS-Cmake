@@ -10,7 +10,7 @@
 #ifdef MEMDATA_TESTS
 #include <iostream>
 
-#include "TMemData.h"
+#include "../lib_vector/TMemData.h"
 
 TEST(FunctionsForMemData, calculate_capacity) {
   // Создаём объект с ненулевым размером, чтобы проверить ветку size <= _size
@@ -254,7 +254,7 @@ TEST(ClassMemData, can_assigment) {
 #endif
 
 #ifdef VECTOR_TESTS
-#include "TVector.h"
+#include "../lib_vector/TVector.h"
 
 TEST(ClassVector, can_create_with_default_constructor) {
   TVector<double> v1;

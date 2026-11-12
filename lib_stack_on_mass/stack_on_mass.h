@@ -1,7 +1,7 @@
 // Copyright 2026 SVEGAK/Novikov R
 
-#ifndef LIB_STACK_ON_MASS_H
-#define LIB_STACK_ON_MASS_H
+#ifndef LIB_STACK_ON_MASS_STACK_ON_MASS_H_
+#define LIB_STACK_ON_MASS_STACK_ON_MASS_H_
 
 #include <exception>
 
@@ -111,4 +111,4 @@ inline const T& TStackOnMass<T>::top() const {
   return _data[_top];
 }
 
-#endif  // LIB_STACK_ON_MASS_H
+#endif  // LIB_STACK_ON_MASS_STACK_ON_MASS_H_

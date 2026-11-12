@@ -6,7 +6,7 @@
 #ifdef STACK_ON_MASS_TESTS
 #include <string>
 
-#include "stack_on_mass.h"
+#include "../lib_stack_on_mass/stack_on_mass.h"
 
 TEST(TStackOnMassCtor, ZeroSizeThrows) {
   EXPECT_THROW(TStackOnMass<int>(0), std::invalid_argument);

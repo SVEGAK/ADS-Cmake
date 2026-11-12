@@ -1,18 +1,14 @@
 // Copyright 2026 SVEGAK/Novikov R
 
-#ifndef LIB_BITFIELD
-#define LIB_BITFIELD
+#ifndef LIB_BITFIELD_BITFIELD_H_
+#define LIB_BITFIELD_BITFIELD_H_
 
-#include <algorithm>
-#include <climits>  //Для CHAR_BITS
+#include <algorithm>  // std::copy
 #include <cstddef>
 #include <iostream>
-namespace {
+#include <string>     // std::string
+#include <utility>    // std::swap
 
-constexpr size_t kBlockLength =
-    sizeof(unsigned int) * CHAR_BIT;  // Кол-во битов в 1 блоке _data[i]
-
-}
 class BitField {
   unsigned int* _data;
   size_t _size;  // max мощность множества (количество элементов = кол-во блоков
@@ -25,7 +21,7 @@ class BitField {
                                      // блоков (фактически длины массива)
 
  public:
-  BitField(size_t size = 0);
+  explicit BitField(size_t size = 0);
   BitField(const BitField& other);
   BitField(BitField&& other) noexcept;
   ~BitField();
@@ -54,4 +50,4 @@ class BitField {
   friend std::istream& operator>>(std::istream& is, BitField& bf);
 };
 
-#endif  // LIB_BITFIELD
+#endif  // LIB_BITFIELD_BITFIELD_H_

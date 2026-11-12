@@ -5,11 +5,10 @@
 
 #include <exception>
 
-#include "stack_on_mass.h"
+#include "../lib_stack_on_mass/stack_on_mass.h"
 // Очередь реализована двумя стеками:
 // _in стек куда вводятся новые элементы
-// _out стек в который переворачиваются и переносятся элементы из _in (если _out
-// пуст)
+// _out стек в который переворачиваются и переносятся элементы из _in (если _out пуст)
 
 template <typename T>
 class TQueueOnStacks {

@@ -1,5 +1,19 @@
 // Copyright 2026 SVEGAK/Novikov R
-#include "bitfield.h"
+
+#include "../lib_bitfield/bitfield.h"
+
+#include <algorithm>  // std::copy
+#include <climits>    // CHAR_BIT
+#include <string>     // std::string
+#include <utility>    // std::swap
+
+namespace bitfield_detail {
+
+constexpr size_t kBlockLength = sizeof(unsigned int) * CHAR_BIT; // Кол-во битов в 1 блоке _data[i]
+
+}  // namespace bitfield_detail
+
+using namespace bitfield_detail;
 
 unsigned int BitField::get_mask(size_t pos) {
   if (pos >= _size) {

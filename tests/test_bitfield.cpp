@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "bitfield.h"
+#include "../lib_bitfield/bitfield.h"
 
 // --- создание / размер ---
 

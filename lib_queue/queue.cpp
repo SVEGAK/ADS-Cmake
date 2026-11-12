@@ -1,2 +1,2 @@
 // Copyright 2026 SVEGAK/Novikov R
-#include "queue.h"
+#include "../lib_queue/queue.h"
